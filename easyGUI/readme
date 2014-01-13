@@ -1,0 +1,2 @@
+sudo apt-get install python3-tk
+sudo  /usr/bin/python3  setup.py  install
