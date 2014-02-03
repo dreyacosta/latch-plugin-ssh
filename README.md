@@ -6,7 +6,7 @@ libpam0g-dev python3 build-essential libcurl4-openssl-dev
 
 
 ----------------------------------------------------
-Install guide:
+Installation guide:
 ----------------------------------------------------
 
 1. cd python/
