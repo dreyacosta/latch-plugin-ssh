@@ -1,65 +1,21 @@
-
-Dependencies:
-
-libpam0g-dev python3 build-essential libcurl4-openssl-dev
+### LATCH SSH PLUGIN -- INSTALLATION GUIDE ###
 
 
+#### PREREQUISITES ####
 
-----------------------------------------------------
-Installation guide:
-----------------------------------------------------
+ * OpenSSH version 5.9. (UNIX system)
 
-1. cd python/
+ * Libraries: python3 python3-tk (apt-get install)
 
-2. Add your settings in latch-model.conf and save it as latch.conf
+ * EasyGui (included in latch-plugin-ssh package)
 
-3. Run 'sudo python3 install.py -f latch.conf'
-
-4. Linux Restart SSH
-
-sudo /etc/init.d/ssh restart
+* To get the "Application ID" and "Secret", (fundamental values for integrating Latch in any application), it’s necessary to register a developer account in Latch's website: https://latch.elevenpaths.com. On the upper right side, click on "Developer area".
 
 
+#### INSTALLING THE PLUGIN IN SSH ####
 
-Install EasyGui (neccesary to use graphic user interface):
+1. Go to "python" directory in plugin package, open and edit "latch-model.conf" file. Add your settings and save it in the same directory as "latch.conf".
 
-1. sudo apt-get install python3-tk
-2. cd easyGui/
+2. Open a terminal. Change to "python" directory, where you have saved the "latch.conf" file. Run "sudo python3 install.py -f latch.conf".
 
-sudo  /usr/bin/python3  setup.py  install
-
-
------------------------------------------------------
-Use of Latch:
------------------------------------------------------
-
-- Command line
-
-In python/ folder
-
-Pair with Latch: 'sudo python3 pair.py <TOKEN>'
-
-Unpair Latch: 'sudo python3 unpair.py'
-
-Config latch settings: 'sudo python3 settings.py -f latch.conf'
-
-
-- Graphic User Interface
-
-Pair and unpair with Latch: 'sudo /etc/ssh/latch/gui/latchPlugin.py'
-
-Config latch settings: 'sudo /etc/ssh/latch/gui/settings.py'
-
-
-
-----------------------------------------------------
-Uninstall:
-----------------------------------------------------
-
-1. cd python/
-
-2. Run 'sudo python3 uninstall.py'
-
-3. Linux Restart SSH
-
-sudo /etc/init.d/ssh restart
+3. Linux Restart SSH "sudo /etc/init.d/ssh restart".
