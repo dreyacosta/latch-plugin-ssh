@@ -25,36 +25,20 @@
 import urllib.request
 import sys
 import os
+import syslog
 
-sys.path.append('/etc/ssh/latch/')
+sys.path.append('/usr/lib/openssh/latch/')
+
 import latch
+from latchHelper import *
 
-def getConfigParameter(name):
 
-    # read latch config file
-    f = open("/etc/pam.d/latch.conf","r");
-    lines = f.readlines();
-    f.close();
 
-    # find parameter
-    for line in lines:
-        if line.find(name) != -1:
-            break;
+def send_syslog_alert(msg): 
+    syslog.openlog(logoption=syslog.LOG_PID, facility=syslog.LOG_AUTH) 
+    syslog.syslog('Latch ssh warning: Someone tried to access. ' + msg)
+    syslog.closelog()
 
-    words = line.split();   
-    if len(words) == 3:
-        return words[2];
-    return None;
-
-def getAccountId(user, lines):
-
-    for line in lines:
-        if line.find(user) != -1:
-            words = line.split();
-            if len(words) == 2:
-                return words[1];
-            break; 
-    return None;
 
 
 secret_key = getConfigParameter("secret_key");
@@ -64,18 +48,13 @@ if app_id == None or secret_key == None:
     print("Can't read config file");
     exit();
 
-# read latch_accounts file
-f = open("/etc/pam.d/latch_accounts","r");
-lines = f.readlines();
-f.close();
-
 user = os.getlogin();
-accountId = getAccountId(user, lines);
+accountId = getAccountId(user);
 if accountId == None:
     sys.exit(0);
 
 api = latch.Latch(app_id, secret_key)
-latch.Latch.set_host("https://latch.elevenpaths.com")
+latch.Latch.set_host(LATCH_HOST)
 
 accountIdUrl = urllib.request.pathname2url(accountId)
 try:
@@ -85,11 +64,13 @@ except:
 
 if ('operations' in result.data) and (app_id in result.data['operations']) and ('status' in result.data['operations'][app_id]): 
     if result.data['operations'][app_id]['status'] == "off":
+        send_syslog_alert('Latch locked.')
         sys.exit(1)
     if result.data['operations'][app_id]['status'] == "on":
         if 'two_factor' in result.data['operations'][app_id]:
             input_token = input("One-time code: ")
             if 'token' in result.data['operations'][app_id]['two_factor']:
                 if result.data['operations'][app_id]['two_factor']['token'] != input_token:
+                    send_syslog_alert('Bad OTP.')
                     sys.exit(1)
 sys.exit(0)

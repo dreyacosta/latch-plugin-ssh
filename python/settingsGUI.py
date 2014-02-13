@@ -28,29 +28,10 @@ import sys
 import os
 import urllib.request
 
-sys.path.append('/etc/ssh/latch/')
-import latch
+from latchHelper import *
 
 
-def getConfigParameter(name):
-
-    # read latch config file
-    f = open("/etc/pam.d/latch.conf","r");
-    lines = f.readlines();
-    f.close();
-
-    # find parameter
-    for line in lines:
-        if line.find(name) != -1:
-            break;
-
-    words = line.split();   
-    if len(words) == 3:
-        return words[2];
-    return None;
-
-
-   
+ 
 secret_key = getConfigParameter("secret_key");
 app_id = getConfigParameter("app_id");
 
@@ -59,7 +40,7 @@ if app_id == None or secret_key == None:
     exit();
 
 msg = "Identify your application"
-title = "Settings"
+title = PLUGIN_NAME + " settings"
 fieldNames = ["Application ID","Secret key"]
 fieldValues = [app_id, secret_key]  # we start with blanks for the values
 fieldValues = eg.multenterbox(msg,title, fieldNames, fieldValues)
@@ -72,22 +53,7 @@ while 1:
         if fieldValues[i].strip() == "":
             errmsg += ('"%s" is a required field.\n\n' % fieldNames[i])
     if errmsg == "":
-        # write config file
-        fd = os.open ("/etc/pam.d/latch.conf", os.O_WRONLY | os.O_CREAT, int("0600",8))
-        f = os.fdopen(fd,"w")
-        f.write("#\n")
-        f.write("# Configuration file for the latch PAM module\n")
-        f.write("#\n")
-        f.write("\n")
-        f.write("# Identify your Application\n")
-        f.write("# Secret key value\n")
-        f.write("#\n")
-        f.write("app_id = " + fieldValues[0] + "\n")
-        f.write("\n")
-        f.write("# Application ID value\n")
-        f.write("#\n")
-        f.write("secret_key = " + fieldValues[1] + "\n")
-        f.close()
+        replaceConfigParameters(fieldValues[0], fieldValues[1])
         secret_key = fieldValues[1]
         app_id = fieldValues[0]
         break # no problems found

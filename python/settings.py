@@ -1,3 +1,8 @@
+#!/usr/bin/env python3
+# -*- coding: UTF-8 -*-
+# vim: set fileencoding=utf-8
+# Run as root
+
 '''
  This script allows to configure latch settings (application id and secret key)
  Copyright (C) 2013 Eleven Paths
@@ -19,16 +24,17 @@
 
 
 import sys
+from latchHelper import *
 
 if len(sys.argv) == 3 and sys.argv[1] == "-f":
-    # read config file
-    f = open(sys.argv[2],"r")
-    lines = f.readlines()
-    f.close()
-    # write config file
-    f = open("/etc/pam.d/latch.conf","w")
-    f.writelines(lines)
-    f.close()
+    secret_key = getConfigParameter("secret_key", sys.argv[2])
+    app_id = getConfigParameter("app_id", sys.argv[2])
+    if app_id == None or secret_key == None:
+        print("Can't read config file");
+        exit()
+
+    replaceConfigParameters(app_id, secret_key)
+
 elif len(sys.argv) != 1:
     print("use 'settings.py -f <file.conf>'")
     exit()

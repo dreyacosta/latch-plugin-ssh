@@ -1,5 +1,10 @@
+#!/usr/bin/env python3
+# -*- coding: UTF-8 -*-
+# vim: set fileencoding=utf-8
+# Run as root
+
 '''
- This script allows to pair our ssh Server with Latch in some UNIX systems (like Linux)
+ This script allows to pair our application with Latch in some UNIX systems (like Linux)
  Copyright (C) 2013 Eleven Paths
 
  This library is free software; you can redistribute it and/or
@@ -17,44 +22,23 @@
  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 '''
 
-#!/usr/bin/env python3
-# -*- coding: UTF-8 -*-
-# vim: set fileencoding=utf-8
-# Run as root
 
 import sys
 import os
 import urllib.request
 import latch
 
-
-def getConfigParameter(name):
-
-    # read latch config file
-    f = open("/etc/pam.d/latch.conf","r");
-    lines = f.readlines();
-    f.close();
-
-    # find parameter
-    for line in lines:
-        if line.find(name) != -1:
-            break;
-
-    words = line.split();   
-    if len(words) == 3:
-        return words[2];
-    return None;
+from latchHelper import *
 
 
 if len(sys.argv) == 4 and sys.argv[2] == "-f":
-    # read config file
-    f = open(sys.argv[3],"r");
-    lines = f.readlines();
-    f.close();
-    # write config file
-    f = open("/etc/pam.d/latch.conf","w");
-    f.writelines(lines);
-    f.close();
+    secret_key = getConfigParameter("secret_key", sys.argv[3])
+    app_id = getConfigParameter("app_id", sys.argv[3])
+    if app_id == None or secret_key == None:
+        print("Can't read config file");
+        exit()
+
+    replaceConfigParameters(app_id, secret_key)
 
 elif len(sys.argv) != 2:
     print("use 'pair.py <TOKEN> [ -f <file.conf> ]'");
@@ -65,47 +49,39 @@ app_id = getConfigParameter("app_id");
 
 if app_id == None or secret_key == None:
     print("Can't read config file");
-    exit();
+    exit()
 
-api = latch.Latch(app_id, secret_key);
+user = os.getlogin()
+if isPair(user):
+    print("User '"+ user + "' is already paired")
+    exit()
 
-latch.Latch.set_host("https://latch.elevenpaths.com")
+api = latch.Latch(app_id, secret_key)
+latch.Latch.set_host(LATCH_HOST)
 
-user = os.getlogin();
-if os.path.isfile("/etc/pam.d/latch_accounts"):
-    # read latch_accounts file
-    f = open("/etc/pam.d/latch_accounts","r")
-    lines = f.readlines()
-    f.close()
-    # find user
-    found = False 
-    for line in lines:
-        if line.find(user) != -1:
-            found = True
-            break
-    if found:
-        print("Paired");
-        exit()
+reply = sys.argv[1]
 
-token = urllib.request.pathname2url(sys.argv[1]);
-res = api.pair(token); 
+if len(reply) != 6:
+    print("Token not found")
+    exit()
+
+token = urllib.request.pathname2url(reply);
+try:
+    res = api.pair(token)
+except:
+    print("Error: Some exception happened")
+    exit()
 
 responseData = res.get_data()
 responseError = res.get_error()
 
-if responseData != "":
+if 'accountId' in responseData:
     accountId = responseData["accountId"] 
-    if os.path.isfile("/etc/pam.d/latch_accounts"):
-        # add latch account
-        f = open ("/etc/pam.d/latch_accounts", "a")
-        f.write(user + ": " + accountId)
-        f.close();
-    else:
-        # add latch account  
-        fd = os.open ("/etc/pam.d/latch_accounts", os.O_WRONLY | os.O_CREAT, int("0600",8))
-        f = os.fdopen(fd)
-        f.write(user + ": " + accountId + "\n");
-        f.close();    
+    addAccount(user, accountId)   
     print("Paired");
 elif responseError != "":
-    print (responseError);
+    title_error = 'Error - ' + str(responseError.get_code())
+    if responseError.get_message() == 'Invalid application signature':
+        print("Settings error: Bad secret key or application id")
+    else:
+        print(responseError.get_message())
