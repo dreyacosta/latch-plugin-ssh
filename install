@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+
+cd python/
+find latch.conf
+sudo python3 setup.py -f latch.conf
+cd ../include/
+gcc wrapper_sshd.c -o wp_sshd
+gcc wrapper_pair.c -o pairSSH
+gcc wrapper_unpair.c -o unpairSSH
+gcc wrapper_latchPluginGUI.c -o latchSSH
+gcc wrapper_settings.c -o config_latchSSH
+sudo chown root:root wp_sshd pairSSH unpairSSH latchSSH config_latchSSH
+sudo mv wp_sshd /usr/sbin/
+sudo mv pairSSH /usr/bin/
+sudo mv unpairSSH /usr/bin/
+sudo mv latchSSH /usr/bin/
+sudo mv config_latchSSH /usr/sbin/
+sudo chmod 4111 /usr/sbin/wp_sshd /usr/bin/latchSSH /usr/bin/pairSSH /usr/bin/unpairSSH
+sudo chmod 0100 /usr/sbin/config_latchSSH

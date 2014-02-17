@@ -1,5 +1,10 @@
+#!/usr/bin/env python3
+# -*- coding: UTF-8 -*-
+# vim: set fileencoding=utf-8
+# Run as root
+
 '''
- This script allows to uninstall latch plugin from ssh Server in some UNIX systems (like Linux)
+ This script allows to uninstall latch plugin from openvpn Server in some UNIX systems (like Linux)
  Copyright (C) 2013 Eleven Paths
 
  This library is free software; you can redistribute it and/or
@@ -18,46 +23,43 @@
 '''
 
 
-# run as root
-
 import os
 import shutil
 
-# read PAM sshd file
-f = open("/etc/pam.d/sshd","r");
-lines = f.readlines();
-f.close();
-# delete latch PAM 
-f = open("/etc/pam.d/sshd","w");
-for line in lines:
-    if line.find("/lib/security/pam_latch.so") == -1 :
-        f.write(line);
-f.close();
+from latchHelper import *
+
+
 
 # read sshd_config file
-f = open("/etc/ssh/sshd_config","r");
+f = open(SSHD_CONFIG,"r");
 lines = f.readlines();
 f.close();
 # delete latch
-f = open("/etc/ssh/sshd_config","w");
+f = open(SSHD_CONFIG,"w");
 for line in lines:
-    if line.find("ForceCommand /usr/sbin/sshd.sh") == -1 :
+    if line.find("ForceCommand " + WRAPPER_EXE) == -1 :
         f.write(line);
 f.close();
 
+if os.path.isfile(LATCH_ACCOUNTS):
+    os.remove(LATCH_ACCOUNTS)
+if os.path.isfile(LATCH_CONFIG):
+    os.remove(LATCH_CONFIG)
+if os.path.isfile(WRAPPER_SH):
+    os.remove(WRAPPER_SH)
+if os.path.isfile(WRAPPER_PY):
+    os.remove(WRAPPER_PY)
+if os.path.isfile(WRAPPER_EXE):
+    os.remove(WRAPPER_EXE)
+if os.path.isdir(LATCH_PATH):
+    shutil.rmtree(LATCH_PATH)
+if os.path.isfile(PAIR_BIN):
+    os.remove(PAIR_BIN)
+if os.path.isfile(UNPAIR_BIN):
+    os.remove(UNPAIR_BIN)
+if os.path.isfile(PLUGIN_BIN):
+    os.remove(PLUGIN_BIN)
+if os.path.isfile(SETTINGS_BIN):
+    os.remove(SETTINGS_BIN)
 
-if os.path.isfile("/etc/pam.d/latch_accounts"):
-    os.remove("/etc/pam.d/latch_accounts")
-if os.path.isfile("/etc/pam.d/latch.conf"):
-    os.remove("/etc/pam.d/latch.conf")
-if os.path.isfile("/lib/security/pam_latch.so"):
-    os.remove("/lib/security/pam_latch.so")
-if os.path.isfile("/usr/sbin/sshd.sh"):
-    os.remove("/usr/sbin/sshd.sh")
-if os.path.isfile("/usr/sbin/sshd.py"):
-    os.remove("/usr/sbin/sshd.py")
-if os.path.isfile("/etc/sudoers.d/latch_conf"):
-    os.remove("/etc/sudoers.d/latch_conf")
-if os.path.isdir("/etc/ssh/latch"):
-    shutil.rmtree("/etc/ssh/latch")
 print("Uninstall completed")

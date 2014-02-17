@@ -4,7 +4,7 @@
 # run as root
 
 '''
- This plugin allows to pair and upair our ssh Server with Latch in some UNIX systems (like Linux)
+ This plugin allows to pair and upair our application with Latch in some UNIX systems (like Linux)
  Copyright (C) 2013 Eleven Paths
 
  This library is free software; you can redistribute it and/or
@@ -27,38 +27,10 @@ import easygui as eg
 import sys
 import os
 import urllib.request
-
-sys.path.append('/etc/ssh/latch/')
 import latch
 
+from latchHelper import *
 
-def getConfigParameter(name):
-
-    # read latch config file
-    f = open("/etc/pam.d/latch.conf","r");
-    lines = f.readlines();
-    f.close();
-
-    # find parameter
-    for line in lines:
-        if line.find(name) != -1:
-            break;
-
-    words = line.split();   
-    if len(words) == 3:
-        return words[2]
-    return None
-
-
-def getAccountId(user, lines):
-
-    for line in lines:
-        if line.find(user) != -1:
-            words = line.split()
-            if len(words) == 2:
-                return words[1]
-            break
-    return None
 
 
 def pair_gui():
@@ -71,7 +43,7 @@ def pair_gui():
         exit();
 
     api = latch.Latch(app_id, secret_key)
-    latch.Latch.set_host("https://latch.elevenpaths.com")
+    latch.Latch.set_host(LATCH_HOST)
 
     reply = eg.enterbox(msg='Token', title='Pair', default='', strip=True, image=None, root=None);
     if reply == None:
@@ -98,17 +70,7 @@ def pair_gui():
     if 'accountId' in responseData:
         user = os.getlogin()
         accountId = responseData["accountId"]
-        if os.path.isfile("/etc/pam.d/latch_accounts"):
-            # add latch account               
-            f = open ("/etc/pam.d/latch_accounts", "a")
-            f.write(user + ": " + accountId);
-            f.close()
-        else:
-            # add latch account
-            fd = os.open ("/etc/pam.d/latch_accounts", os.O_WRONLY | os.O_CREAT, int("0600",8))
-            f = os.fdopen(fd)
-            f.write(user + ": " + accountId+ "\n");
-            f.close();
+        addAccount(user, accountId)
         eg.msgbox(msg='Paired',title='Pair');
     elif responseError != "":
         title_error = 'Error - ' + str(responseError.get_code())
@@ -128,15 +90,10 @@ def unpair_gui():
         exit();
 
     api = latch.Latch(app_id, secret_key);
-    latch.Latch.set_host("https://latch.elevenpaths.com")
-    
-    # read latch_accounts file
-    f = open("/etc/pam.d/latch_accounts","r")
-    lines = f.readlines()
-    f.close()
+    latch.Latch.set_host(LATCH_HOST)
     
     user = os.getlogin()
-    accountId = getAccountId(user, lines)
+    accountId = getAccountId(user)
     if accountId == None:
         eg.msgbox(msg="Can't read latch_accounts file",title='Error')
         return;
@@ -150,49 +107,29 @@ def unpair_gui():
 
     responseError = res.get_error()
 
-    if responseError != "":
+    if responseError != "" and responseError.get_message() != 'Account not paired':
         title_error = 'Error - ' + str(responseError.get_code())
         if responseError.get_message() == 'Invalid application signature':
             eg.msgbox(msg="Settings error: Bad secret key or application id",title=title_error)
         else:
             eg.msgbox(msg=responseError.get_message(),title=title_error)
     else:
-        # delete latch account
-        f = open("/etc/pam.d/latch_accounts","w")
-        for line in lines:
-            if line.find(accountId) == -1 :
-                f.write(line);
-        f.close();
+        deleteAccount(accountId)
         eg.msgbox(msg='Unpaired',title='Unpair')
 
 
-def isPair():
-    user = os.getlogin()
-    if os.path.isfile("/etc/pam.d/latch_accounts"):
-        # read latch_accounts file
-        f = open("/etc/pam.d/latch_accounts","r")
-        lines = f.readlines()
-        f.close()
-        # find user
-        found = False          
-        for line in lines:
-            if line.find(user) != -1:
-                found = True
-                break
-        if found:
-            return True
-        return False
 
 
 operations = ["Pair","Unpair","Exit"]
+user = os.getlogin()
 
 while 1:
-    if isPair():
+    if isPair(user):
         operations = ["Unpair","Exit"]
     else:
         operations = ["Pair","Exit"]
 
-    reply = eg.buttonbox(msg='Operation', title='Latch plugin - SSH',image=None, choices=operations)
+    reply = eg.buttonbox(msg='Operation', title=PLUGIN_NAME,image=None, choices=operations)
 
     if reply == "Pair":
         pair_gui()

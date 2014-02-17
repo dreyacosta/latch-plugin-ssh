@@ -1,5 +1,10 @@
+#!/usr/bin/env python3
+# -*- coding: UTF-8 -*-
+# vim: set fileencoding=utf-8
+# Run as root
+
 '''
- This script allows to unpair our ssh Server in some UNIX systems (like Linux)
+ This script allows to unpair our application in some UNIX systems (like Linux)
  Copyright (C) 2013 Eleven Paths
 
  This library is free software; you can redistribute it and/or
@@ -17,54 +22,24 @@
  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 '''
 
-#!/usr/bin/env python3
-# -*- coding: UTF-8 -*-
-# vim: set fileencoding=utf-8
-# Run as root
 
 import sys
 import os
 import urllib.request
 import latch
 
+from latchHelper import *
 
-def getConfigParameter(name):
-
-    # read latch config file
-    f = open("/etc/pam.d/latch.conf","r");
-    lines = f.readlines();
-    f.close();
-
-    # find parameter
-    for line in lines:
-        if line.find(name) != -1:
-            break;
-
-    words = line.split();   
-    if len(words) == 3:
-        return words[2];
-    return None;
-
-def getAccountId(user, lines):
-
-    for line in lines:
-        if line.find(user) != -1:
-            words = line.split();
-            if len(words) == 2:
-                return words[1];
-            break; 
-    return None;
 
 
 if len(sys.argv) == 3 and sys.argv[1] == "-f":
-    # read config file
-    f = open(sys.argv[2],"r");
-    lines = f.readlines();
-    f.close();
-    # write config file
-    f = open("/etc/pam.d/latch.conf","w");
-    f.writelines(lines);
-    f.close();
+    secret_key = getConfigParameter("secret_key", sys.argv[2])
+    app_id = getConfigParameter("app_id", sys.argv[2])
+    if app_id == None or secret_key == None:
+        print("Can't read config file");
+        exit()
+
+    replaceConfigParameters(app_id, secret_key)
 elif len(sys.argv) != 1:
     print("use 'unpair.py [ -f <file.conf> ]'");
     exit();
@@ -76,34 +51,29 @@ if app_id == None or secret_key == None:
     print("Can't read config file");
     exit();
 
-# read latch_accounts file
-f = open("/etc/pam.d/latch_accounts","r");
-lines = f.readlines();
-f.close();
-
-user = os.getlogin();
-accountId = getAccountId(user, lines);
+user = os.getlogin()
+accountId = getAccountId(user);
 if accountId == None:
-    print("User not paired");
+    print("User '" + user + "' not paired");
     exit();
 
 api = latch.Latch(app_id, secret_key);
-
-latch.Latch.set_host("https://latch.elevenpaths.com");
+latch.Latch.set_host(LATCH_HOST);
 
 accountIdUrl = urllib.request.pathname2url(accountId);
-res = api.unpair(accountIdUrl); 
+try:
+    res = api.unpair(accountIdUrl);
+except:
+    print("Error: Some exception happened")
+    exit()
 
 responseError = res.get_error();
 
-if responseError != "":
-    print (responseError);
+if responseError != "" and responseError.get_message() != 'Account not paired':
+    if responseError.get_message() == 'Invalid application signature':
+        print("Settings error: Bad secret key or application id")
+    else:
+        print(responseError.get_message())
 else:
-    # delete latch account
-    f = open("/etc/pam.d/latch_accounts","w");
-    for line in lines:
-        if line.find(accountId) == -1 :
-            f.write(line);
-    f.close();
-
+    deleteAccount(accountId)
     print("Unpaired");
