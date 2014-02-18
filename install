@@ -17,3 +17,5 @@ sudo mv latchSSH /usr/bin/
 sudo mv config_latchSSH /usr/sbin/
 sudo chmod 4111 /usr/sbin/wp_sshd /usr/bin/latchSSH /usr/bin/pairSSH /usr/bin/unpairSSH
 sudo chmod 0100 /usr/sbin/config_latchSSH
+cd ../../easyGUI/
+sudo python3 setup.py install
