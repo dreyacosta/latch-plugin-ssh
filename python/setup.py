@@ -36,12 +36,12 @@ if len(sys.argv) == 3 and sys.argv[1] == "-f":
     app_id = getConfigParameter("app_id", sys.argv[2])
     if app_id == None or secret_key == None:
         print("Can't read config file");
-        exit()
+        exit(1)
 
     replaceConfigParameters(app_id, secret_key)
 else:
     print("use 'setup.py -f <file.conf>'");
-    exit();
+    exit(1);
 
 # read sshd_config file
 f = open(SSHD_CONFIG,"r")
@@ -97,3 +97,4 @@ if not os.path.isfile(LATCH_ACCOUNTS):
     fd = os.open (LATCH_ACCOUNTS, os.O_CREAT, int("0600",8))
 
 print("latch plugin installing...")
+exit(0)
