@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 # vim: set fileencoding=utf-8
 
@@ -22,7 +22,6 @@
 '''
 
 
-import urllib.request
 import sys
 import os
 import syslog
@@ -56,9 +55,8 @@ if accountId == None:
 api = latch.Latch(app_id, secret_key)
 latch.Latch.set_host(LATCH_HOST)
 
-accountIdUrl = urllib.request.pathname2url(accountId)
 try:
-    result = api.status(accountIdUrl); 
+    result = api.status(accountId); 
 except:
     sys.exit(0)
 

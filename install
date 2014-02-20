@@ -2,7 +2,7 @@
 
 cd python/
 find latch.conf
-sudo python3 setup.py -f latch.conf
+sudo python setup.py -f latch.conf
 
 if test "$?" = 0
 then
