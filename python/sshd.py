@@ -26,7 +26,7 @@ import sys
 import os
 import syslog
 
-sys.path.append('/usr/lib/openssh/latch/')
+sys.path.append('/usr/lib/latch/openssh/')
 
 import latch
 from latchHelper import *
@@ -66,7 +66,10 @@ if ('operations' in result.data) and (app_id in result.data['operations']) and (
         sys.exit(1)
     if result.data['operations'][app_id]['status'] == "on":
         if 'two_factor' in result.data['operations'][app_id]:
-            input_token = input("One-time code: ")
+            if sys.version_info < (3,0):
+                input_token = raw_input("One-time code: ")
+            else:
+                input_token = input("One-time code: ")
             if 'token' in result.data['operations'][app_id]['two_factor']:
                 if result.data['operations'][app_id]['two_factor']['token'] != input_token:
                     send_syslog_alert('Bad OTP.')

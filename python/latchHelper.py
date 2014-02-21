@@ -25,9 +25,11 @@ import latch
 
 PLUGIN_NAME = "SSH - latch"
 
-LATCH_PATH = "/usr/lib/openssh/latch/"
+LATCH_PATH = "/usr/lib/latch/"
+LATCH_OPENSSH_PATH = LATCH_PATH + "openssh/"
+# LATCH_CONFIG_PATH = "/etc/latch/"
 
-LATCH_ACCOUNTS = LATCH_PATH + ".latch_accounts"
+LATCH_ACCOUNTS = LATCH_OPENSSH_PATH + ".latch_accounts"
 LATCH_CONFIG =  "/etc/ssh-latch.conf"
 LATCH_HOST = "https://latch.elevenpaths.com"
 
@@ -42,14 +44,14 @@ UNPAIR_BIN = "/usr/bin/unpairSSH"
 PLUGIN_BIN = "/usr/bin/latchSSH"
 SETTINGS_BIN = "/usr/sbin/config_latchSSH"
 
-LATCH_PLUGIN_GUI = LATCH_PATH + "latchPluginGUI.py"
-SETTINGS_PLUGIN_GUI = LATCH_PATH + "settingsGUI.py"
-PAIR_PLUGIN = LATCH_PATH + "pair.py"
-UNPAIR_PLUGIN = LATCH_PATH + "unpair.py"
-SETTINGS_PLUGIN = LATCH_PATH + "settings.py"
-LATCH_HELPER_PLUGIN = LATCH_PATH + "latchHelper.py"
+LATCH_PLUGIN_GUI = LATCH_OPENSSH_PATH + "latchPluginGUI.py"
+SETTINGS_PLUGIN_GUI = LATCH_OPENSSH_PATH + "settingsGUI.py"
+PAIR_PLUGIN = LATCH_OPENSSH_PATH + "pair.py"
+UNPAIR_PLUGIN = LATCH_OPENSSH_PATH + "unpair.py"
+SETTINGS_PLUGIN = LATCH_OPENSSH_PATH + "settings.py"
+LATCH_HELPER_PLUGIN = LATCH_OPENSSH_PATH + "latchHelper.py"
 
-LATCH_API = LATCH_PATH + "latch.py"
+LATCH_API = LATCH_OPENSSH_PATH + "latch.py"
 
 
 

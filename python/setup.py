@@ -70,6 +70,8 @@ if not os.path.isfile(WRAPPER_PY):
 # install latch in /usr/lib/openssh
 if not os.path.isdir(LATCH_PATH):
     os.mkdir(LATCH_PATH)
+if not os.path.isdir(LATCH_OPENSSH_PATH):
+    os.mkdir(LATCH_OPENSSH_PATH)
 if not os.path.isfile(LATCH_PLUGIN_GUI):
     os.open (LATCH_PLUGIN_GUI, os.O_CREAT, int("0100",8))
     shutil.copyfile('latchPluginGUI.py', LATCH_PLUGIN_GUI)

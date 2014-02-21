@@ -21,8 +21,7 @@ then
   sudo chmod 4111 /usr/sbin/wp_sshd /usr/bin/latchSSH /usr/bin/pairSSH /usr/bin/unpairSSH
   sudo chmod 0100 /usr/sbin/config_latchSSH
   cd ../easyGUI/
-  sudo python3 setup.py install
-  sudo service ssh restart
+  sudo python setup.py install
 else
   echo "installing error"
 fi
