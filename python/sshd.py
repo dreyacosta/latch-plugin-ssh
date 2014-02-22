@@ -34,7 +34,7 @@ from latchHelper import *
 
 
 def send_syslog_alert(msg): 
-    syslog.openlog(logoption=syslog.LOG_PID, facility=syslog.LOG_AUTH) 
+    syslog.openlog('syslog',syslog.LOG_PID, syslog.LOG_AUTH) 
     syslog.syslog('Latch ssh warning: Someone tried to access. ' + msg)
     syslog.closelog()
 
