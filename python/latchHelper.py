@@ -153,7 +153,7 @@ def addAccount(user, accountId):
     if os.path.isfile(LATCH_ACCOUNTS):
         # add latch account
         f = open (LATCH_ACCOUNTS, "a")
-        f.write(user + ": " + accountId)
+        f.write(user + ": " + accountId + "\n")
         f.close();
     else:
         # add latch account  
