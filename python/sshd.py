@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 # vim: set fileencoding=utf-8
 
@@ -22,12 +22,11 @@
 '''
 
 
-import urllib.request
 import sys
 import os
 import syslog
 
-sys.path.append('/usr/lib/openssh/latch/')
+sys.path.append('/usr/lib/latch/openssh/')
 
 import latch
 from latchHelper import *
@@ -35,7 +34,7 @@ from latchHelper import *
 
 
 def send_syslog_alert(msg): 
-    syslog.openlog(logoption=syslog.LOG_PID, facility=syslog.LOG_AUTH) 
+    syslog.openlog('syslog',syslog.LOG_PID, syslog.LOG_AUTH) 
     syslog.syslog('Latch ssh warning: Someone tried to access. ' + msg)
     syslog.closelog()
 
@@ -56,9 +55,8 @@ if accountId == None:
 api = latch.Latch(app_id, secret_key)
 latch.Latch.set_host(LATCH_HOST)
 
-accountIdUrl = urllib.request.pathname2url(accountId)
 try:
-    result = api.status(accountIdUrl); 
+    result = api.status(accountId); 
 except:
     sys.exit(0)
 
@@ -68,7 +66,10 @@ if ('operations' in result.data) and (app_id in result.data['operations']) and (
         sys.exit(1)
     if result.data['operations'][app_id]['status'] == "on":
         if 'two_factor' in result.data['operations'][app_id]:
-            input_token = input("One-time code: ")
+            if sys.version_info < (3,0):
+                input_token = raw_input("One-time code: ")
+            else:
+                input_token = input("One-time code: ")
             if 'token' in result.data['operations'][app_id]['two_factor']:
                 if result.data['operations'][app_id]['two_factor']['token'] != input_token:
                     send_syslog_alert('Bad OTP.')

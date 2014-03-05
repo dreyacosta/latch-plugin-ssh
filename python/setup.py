@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 # vim: set fileencoding=utf-8
 # Run as root
@@ -36,12 +36,12 @@ if len(sys.argv) == 3 and sys.argv[1] == "-f":
     app_id = getConfigParameter("app_id", sys.argv[2])
     if app_id == None or secret_key == None:
         print("Can't read config file");
-        exit()
+        exit(1)
 
     replaceConfigParameters(app_id, secret_key)
 else:
     print("use 'setup.py -f <file.conf>'");
-    exit();
+    exit(1);
 
 # read sshd_config file
 f = open(SSHD_CONFIG,"r")
@@ -70,6 +70,8 @@ if not os.path.isfile(WRAPPER_PY):
 # install latch in /usr/lib/openssh
 if not os.path.isdir(LATCH_PATH):
     os.mkdir(LATCH_PATH)
+if not os.path.isdir(LATCH_OPENSSH_PATH):
+    os.mkdir(LATCH_OPENSSH_PATH)
 if not os.path.isfile(LATCH_PLUGIN_GUI):
     os.open (LATCH_PLUGIN_GUI, os.O_CREAT, int("0100",8))
     shutil.copyfile('latchPluginGUI.py', LATCH_PLUGIN_GUI)
@@ -97,3 +99,4 @@ if not os.path.isfile(LATCH_ACCOUNTS):
     fd = os.open (LATCH_ACCOUNTS, os.O_CREAT, int("0600",8))
 
 print("latch plugin installing...")
+exit(0)
