@@ -29,6 +29,20 @@ import shutil
 from latchHelper import *
 
 
+if os.path.isfile(SSHD_PAM_CONFIG_FILE):
+    # read PAM config file
+    f = open(SSHD_PAM_CONFIG_FILE,"r");
+    lines = f.readlines();
+    f.close();
+    # delete latch PAM 
+    f = open(SSHD_PAM_CONFIG_FILE,"w");
+    for line in lines:
+        if line.find(LATCH_PAM_CONFIG) == -1 :
+            f.write(line);
+    f.close();
+
+
+
 # read sshd_config file
 f = open(SSHD_CONFIG,"r");
 lines = f.readlines();
@@ -39,6 +53,8 @@ for line in lines:
     if line.find("ForceCommand " + WRAPPER_EXE) == -1 :
         f.write(line);
 f.close();
+
+
 
 if os.path.isfile(LATCH_ACCOUNTS):
     os.remove(LATCH_ACCOUNTS)

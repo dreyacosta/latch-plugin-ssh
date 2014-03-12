@@ -45,7 +45,7 @@ app_id = getConfigParameter("app_id");
 
 if app_id == None or secret_key == None:
     print("Can't read config file");
-    exit(0);
+    exit();
 
 user = os.getlogin();
 accountId = getAccountId(user);
@@ -65,5 +65,13 @@ if ('operations' in result.data) and (app_id in result.data['operations']) and (
         send_syslog_alert('Latch locked.')
         sys.exit(1)
     if result.data['operations'][app_id]['status'] == "on":
-        sys.exit(0)
+        if 'two_factor' in result.data['operations'][app_id]:
+            if sys.version_info < (3,0):
+                input_token = raw_input("One-time code: ")
+            else:
+                input_token = input("One-time code: ")
+            if 'token' in result.data['operations'][app_id]['two_factor']:
+                if result.data['operations'][app_id]['two_factor']['token'] != input_token:
+                    send_syslog_alert('Bad OTP.')
+                    sys.exit(1)
 sys.exit(0)

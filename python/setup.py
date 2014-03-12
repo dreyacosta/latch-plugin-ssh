@@ -43,6 +43,28 @@ else:
     print("use 'setup.py -f <file.conf>'");
     exit(1);
 
+
+if os.path.isfile(SSHD_PAM_CONFIG_FILE): 
+    # read openvpn PAM config file
+    f = open(SSHD_PAM_CONFIG_FILE,"r")
+    lines = f.readlines()
+    f.close()
+    # find latch 
+    found = False
+    for line in lines:
+        if line.find(LATCH_PAM_CONFIG) != -1 :
+            found = True
+            break
+    if not found:
+        # add latch PAM configuration
+        f = open(SSHD_PAM_CONFIG_FILE,"a")
+        f.write(LATCH_PAM_CONFIG)
+        f.close()
+else:
+    exit(1)
+
+
+'''
 # read sshd_config file
 f = open(SSHD_CONFIG,"r")
 lines = f.readlines()
@@ -58,6 +80,7 @@ if not found:
     f = open(SSHD_CONFIG,"a")
     f.write("ForceCommand " + WRAPPER_EXE)
     f.close()
+'''
 
 # install the two wrappers, sshd.sh and sshd.py in /usr/sbin
 if not os.path.isfile(WRAPPER_SH):

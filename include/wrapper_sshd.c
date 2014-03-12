@@ -26,7 +26,7 @@ int main( void )
     j= latch();
 
     if (j){
-        printf("disconnect\n");
+        //printf("disconnect\n");
     }else{
         execl("/usr/sbin/sshd.sh", "sshd.sh", NULL);
     }
