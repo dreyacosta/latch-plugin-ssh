@@ -41,8 +41,6 @@ if os.path.isfile(SSHD_PAM_CONFIG_FILE):
             f.write(line);
     f.close();
 
-
-
 # read sshd_config file
 f = open(SSHD_CONFIG,"r");
 lines = f.readlines();
@@ -53,7 +51,6 @@ for line in lines:
     if line.find("ForceCommand " + WRAPPER_EXE) == -1 :
         f.write(line);
 f.close();
-
 
 
 if os.path.isfile(LATCH_ACCOUNTS):

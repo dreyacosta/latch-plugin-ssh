@@ -64,24 +64,41 @@ else:
     exit(1)
 
 
-'''
 # read sshd_config file
 f = open(SSHD_CONFIG,"r")
 lines = f.readlines()
 f.close()
-# find latch
-found = False
+
+forceCommandWrapper = False
+challengeResponseAuthenticationYes = False
+
+# Put latch wrapper
+# Put ChallengeResponseAuthentication yes
+f = open(SSHD_CONFIG,"w");
 for line in lines:
-    if line.find("ForceCommand " + WRAPPER_EXE) != -1 :
-        found = True
-        break
-if not found:
+    if line.find("ChallengeResponseAuthentication") != -1:
+        f.write("ChallengeResponseAuthentication yes\n")
+        challengeResponseAuthenticationYes = True
+    else:
+        f.write(line)
+        if line.find("ForceCommand " + WRAPPER_EXE) != -1 :
+            forceCommandWrapper = True
+f.close();
+
+if not challengeResponseAuthenticationYes:
     # add latch to ssh configuration
     f = open(SSHD_CONFIG,"a")
-    f.write("ForceCommand " + WRAPPER_EXE)
+    f.write("ChallengeResponseAuthentication yes\n")
+    f.close()
+'''
+if not forceCommandWrapper:
+    # add latch to ssh configuration
+    f = open(SSHD_CONFIG,"a")
+    f.write("ForceCommand " + WRAPPER_EXE + "\n")
     f.close()
 '''
 
+'''
 # install the two wrappers, sshd.sh and sshd.py in /usr/sbin
 if not os.path.isfile(WRAPPER_SH):
     os.open (WRAPPER_SH, os.O_CREAT, int("0554",8))
@@ -89,6 +106,7 @@ if not os.path.isfile(WRAPPER_SH):
 if not os.path.isfile(WRAPPER_PY):
     os.open (WRAPPER_PY, os.O_CREAT, int("0500",8))
     shutil.copyfile('sshd.py', WRAPPER_PY)
+'''
 
 # install latch in /usr/lib/openssh
 if not os.path.isdir(LATCH_PATH):
