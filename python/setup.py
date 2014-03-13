@@ -71,22 +71,32 @@ f.close()
 
 forceCommandWrapper = False
 challengeResponseAuthenticationYes = False
+usePamYes = False
+
+shutil.move(SSHD_CONFIG, SSHD_CONFIG + "~")
 
 # Put latch wrapper
 # Put ChallengeResponseAuthentication yes
+# Put UsePAM yes
 f = open(SSHD_CONFIG,"w");
 for line in lines:
-    if line.find("ChallengeResponseAuthentication") != -1:
+    if line.find("ChallengeResponseAuthentication") != -1 and line.find("#") == -1:
         f.write("ChallengeResponseAuthentication yes\n")
         challengeResponseAuthenticationYes = True
+    elif line.find("UsePAM") != -1 and line.find("#") == -1:
+        f.write("UsePAM yes\n")
+        usePamYes = True
     else:
         f.write(line)
         if line.find("ForceCommand " + WRAPPER_EXE) != -1 :
             forceCommandWrapper = True
 f.close();
 
+if not usePamYes:
+    f = open(SSHD_CONFIG,"a")
+    f.write("UsePAM yes\n")
+    f.close()
 if not challengeResponseAuthenticationYes:
-    # add latch to ssh configuration
     f = open(SSHD_CONFIG,"a")
     f.write("ChallengeResponseAuthentication yes\n")
     f.close()
@@ -98,11 +108,11 @@ if not forceCommandWrapper:
     f.close()
 '''
 
-'''
-# install the two wrappers, sshd.sh and sshd.py in /usr/sbin
+# install the wrapper sshd.sh in /usr/sbin
 if not os.path.isfile(WRAPPER_SH):
     os.open (WRAPPER_SH, os.O_CREAT, int("0554",8))
     shutil.copyfile('sshd.sh', WRAPPER_SH)
+'''
 if not os.path.isfile(WRAPPER_PY):
     os.open (WRAPPER_PY, os.O_CREAT, int("0500",8))
     shutil.copyfile('sshd.py', WRAPPER_PY)
