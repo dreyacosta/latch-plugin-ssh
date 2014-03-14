@@ -18,7 +18,12 @@ then
   sudo mv config_latchSSH /usr/sbin/
   sudo chmod 4111 /usr/bin/latchSSH /usr/bin/pairSSH /usr/bin/unpairSSH
   sudo chmod 0100 /usr/sbin/config_latchSSH
-  cd ../pam/libpam/
+  cd wrapper_sshd/
+  make
+  sudo chown root:root wp_sshd 
+  sudo cp wp_sshd /usr/sbin/
+  sudo chmod 4111 /usr/sbin/wp_sshd
+  cd ../../pam/libpam/
   sudo make
   cd ../../easyGUI/
   sudo python setup.py install
