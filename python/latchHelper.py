@@ -34,9 +34,9 @@ LATCH_CONFIG =  "/etc/ssh-latch.conf"
 LATCH_HOST = "https://latch.elevenpaths.com"
 
 SSHD_PAM_CONFIG_FILE = "/etc/pam.d/sshd"
-LATCH_PAM_SO = "/lib/security/pam_latch_otp.so"
+LATCH_PAM_SO = "/lib/security/pam_latch.so"
 
-LATCH_PAM_CONFIG = "auth       required     " + LATCH_PAM_SO + "    accounts=" + LATCH_ACCOUNTS + "    config=" + LATCH_CONFIG
+LATCH_PAM_CONFIG = "auth       required     " + LATCH_PAM_SO + "  accounts=" + LATCH_ACCOUNTS + "  config=" + LATCH_CONFIG + "  otp=yes"
 
 SSHD_CONFIG = "/etc/ssh/sshd_config"
 

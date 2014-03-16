@@ -157,6 +157,7 @@ PAM_EXTERN int pam_sm_authenticate(pam_handle_t* pamh, int flags, int argc, cons
 	const char* pAppId = NULL;
 	const char* pAccounts = NULL;
 	const char* pConfig = NULL;
+	const char* pOtp = NULL;
 	char *buffer;				
 	
 	
@@ -182,6 +183,11 @@ PAM_EXTERN int pam_sm_authenticate(pam_handle_t* pamh, int flags, int argc, cons
 	pConfig = getArg("config", argc, argv);
 	if (!pConfig) {
 		return PAM_AUTH_ERR;
+	}
+
+	pOtp = getArg("otp", argc, argv);
+	if (!pOtp) {
+		pOtp = "no";
 	}
 
 	pAccountId = getAccountId(pUsername, pAccounts);
@@ -217,6 +223,9 @@ PAM_EXTERN int pam_sm_authenticate(pam_handle_t* pamh, int flags, int argc, cons
 		return PAM_AUTH_ERR;
 	}
 	
+	if(strncmp(pOtp, "no", 2) == 0){
+		return PAM_SUCCESS;
+	}
 	
 	if (strstr(buffer, "\"status\":\"on\"") != NULL) {
 		
