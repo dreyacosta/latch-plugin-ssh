@@ -70,7 +70,7 @@ def pair_gui():
         user = os.getlogin()
         accountId = responseData["accountId"]
         addAccount(user, accountId)
-        eg.msgbox(msg='Paired',title='Pair');
+        eg.msgbox(msg=PAIR_MSG,title='Pair');
     elif responseError != "":
         title_error = 'Error - ' + str(responseError.get_code())
         if responseError.get_message() == 'Invalid application signature':
@@ -113,7 +113,7 @@ def unpair_gui():
             eg.msgbox(msg=responseError.get_message(),title=title_error)
     else:
         deleteAccount(accountId)
-        eg.msgbox(msg='Unpaired',title='Unpair')
+        eg.msgbox(msg=UNPAIR_MSG,title='Unpair')
 
 
 

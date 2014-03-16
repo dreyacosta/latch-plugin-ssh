@@ -77,7 +77,7 @@ responseError = res.get_error()
 if 'accountId' in responseData:
     accountId = responseData["accountId"] 
     addAccount(user, accountId)   
-    print("Paired");
+    print(PAIR_MSG);
 elif responseError != "":
     title_error = 'Error - ' + str(responseError.get_code())
     if responseError.get_message() == 'Invalid application signature':

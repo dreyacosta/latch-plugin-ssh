@@ -74,4 +74,4 @@ if responseError != "" and responseError.get_message() != 'Account not paired':
         print(responseError.get_message())
 else:
     deleteAccount(accountId)
-    print("Unpaired");
+    print(UNPAIR_MSG);

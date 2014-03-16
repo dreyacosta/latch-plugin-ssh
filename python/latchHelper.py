@@ -59,6 +59,10 @@ LATCH_HELPER_PLUGIN = LATCH_OPENSSH_PATH + "latchHelper.py"
 LATCH_API = LATCH_OPENSSH_PATH + "latch.py"
 
 
+PAIR_MSG = "Account paired succesfully."
+UNPAIR_MSG = "Account unpaired succesfully."
+
+
 
 def getConfigParameter(name, configFile=LATCH_CONFIG):
 
