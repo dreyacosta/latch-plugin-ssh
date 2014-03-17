@@ -145,7 +145,7 @@ char* http_get_proxy(const char* pUrl) {
 	char* response = malloc(LATCH_BUFFER_SIZE);
 	char* errorResponse = malloc(LATCH_BUFFER_SIZE);
 	CURL* pCurl = curl_easy_init();
-	int res = -1;
+	//int res = -1;
 	int i = 0;
 	int timeOut = 1;	
 	struct curl_slist* chunk = NULL;
@@ -190,7 +190,8 @@ char* http_get_proxy(const char* pUrl) {
 
 
 	// synchronous, but we don't really care
-	res = curl_easy_perform(pCurl);
+	//res = curl_easy_perform(pCurl);
+	curl_easy_perform(pCurl);
 
 	curl_easy_cleanup(pCurl);
 

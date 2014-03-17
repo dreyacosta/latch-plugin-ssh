@@ -24,6 +24,7 @@ then
   sudo cp wp_sshd /usr/sbin/
   sudo chmod 4111 /usr/sbin/wp_sshd
   cd ../../pam/libpam/
+  sudo make clean
   sudo make
   cd ../../easyGUI/
   sudo python setup.py install

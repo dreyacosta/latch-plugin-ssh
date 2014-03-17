@@ -11,12 +11,12 @@
  modify it under the terms of the GNU Lesser General Public
  License as published by the Free Software Foundation; either
  version 2.1 of the License, or (at your option) any later version.
- 
+
  This library is distributed in the hope that it will be useful,
  but WITHOUT ANY WARRANTY; without even the implied warranty of
  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  Lesser General Public License for more details.
- 
+
  You should have received a copy of the GNU Lesser General Public
  License along with this library; if not, write to the Free Software
  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
@@ -34,7 +34,7 @@ if len(sys.argv) == 4 and sys.argv[2] == "-f":
     secret_key = getConfigParameter("secret_key", sys.argv[3])
     app_id = getConfigParameter("app_id", sys.argv[3])
     if app_id == None or secret_key == None:
-        print("Can't read config file");
+        print("Can't read config file.");
         exit()
 
     replaceConfigParameters(app_id, secret_key)
@@ -47,12 +47,12 @@ secret_key = getConfigParameter("secret_key");
 app_id = getConfigParameter("app_id");
 
 if app_id == None or secret_key == None:
-    print("Can't read config file");
+    print("Can't read config file.");
     exit()
 
 user = os.getlogin()
 if isPair(user):
-    print("User '"+ user + "' is already paired")
+    print("User '"+ user + "' is already paired.")
     exit()
 
 api = latch.Latch(app_id, secret_key)
@@ -68,19 +68,19 @@ token = reply;
 try:
     res = api.pair(token)
 except:
-    print("Error: Some exception happened")
+    print("Error: Some exception happened.")
     exit()
 
 responseData = res.get_data()
 responseError = res.get_error()
 
 if 'accountId' in responseData:
-    accountId = responseData["accountId"] 
-    addAccount(user, accountId)   
+    accountId = responseData["accountId"]
+    addAccount(user, accountId)
     print(PAIR_MSG);
 elif responseError != "":
     title_error = 'Error - ' + str(responseError.get_code())
     if responseError.get_message() == 'Invalid application signature':
-        print("Settings error: Bad secret key or application id")
+        print("Settings error: Bad secret key or application id.")
     else:
         print(responseError.get_message())

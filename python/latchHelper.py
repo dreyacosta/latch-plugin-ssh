@@ -6,21 +6,19 @@
  modify it under the terms of the GNU Lesser General Public
  License as published by the Free Software Foundation; either
  version 2.1 of the License, or (at your option) any later version.
- 
+
  This library is distributed in the hope that it will be useful,
  but WITHOUT ANY WARRANTY; without even the implied warranty of
  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  Lesser General Public License for more details.
- 
+
  You should have received a copy of the GNU Lesser General Public
  License along with this library; if not, write to the Free Software
  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 '''
 
 
-import sys
 import os
-import latch
 
 
 PLUGIN_NAME = "SSH - latch"
@@ -37,6 +35,7 @@ SSHD_PAM_CONFIG_FILE = "/etc/pam.d/sshd"
 LATCH_PAM_SO = "/lib/security/pam_latch.so"
 
 LATCH_PAM_CONFIG = "auth       required     " + LATCH_PAM_SO + "  accounts=" + LATCH_ACCOUNTS + "  config=" + LATCH_CONFIG + "  otp=yes"
+#auth       required     /lib/security/pam_latch.so  accounts=/usr/lib/latch/openssh/.latch_accounts  config=/etc/ssh-latch.conf  otp=yes
 
 SSHD_CONFIG = "/etc/ssh/sshd_config"
 
@@ -117,7 +116,7 @@ def getAccountId(user):
                 words = line.split();
                 if len(words) == 2:
                     return words[1];
-                break; 
+                break;
         return None;
     '''
     else:
@@ -132,7 +131,7 @@ def isPair(user):
         lines = f.readlines()
         f.close()
         # find user
-        found = False          
+        found = False
         for line in lines:
             if line.find(user) != -1:
                 found = True
@@ -165,8 +164,8 @@ def addAccount(user, accountId):
         f.write(user + ": " + accountId + "\n")
         f.close();
     else:
-        # add latch account  
+        # add latch account
         fd = os.open (LATCH_ACCOUNTS, os.O_WRONLY | os.O_CREAT, int("0600",8))
         f = os.fdopen(fd)
         f.write(user + ": " + accountId + "\n");
-        f.close();    
+        f.close();

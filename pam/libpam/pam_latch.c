@@ -135,10 +135,8 @@ static const char *getConfig(const char* pParameter, const char* pConfig) {
 
 void send_syslog_alert(){  
 
-	openlog ("ovpn-server", LOG_PID, LOG_AUTH);
-     
-	syslog (LOG_ALERT, "Latch-auth-pam warning: Someone tried to access. Latch locked");
-     
+	openlog ("ovpn-server", LOG_PID, LOG_AUTH);    
+	syslog (LOG_ALERT, "Latch-auth-pam warning: Someone tried to access. Latch locked"); 
 	closelog ();
 }
 
@@ -223,46 +221,47 @@ PAM_EXTERN int pam_sm_authenticate(pam_handle_t* pamh, int flags, int argc, cons
 		return PAM_AUTH_ERR;
 	}
 	
-	if(strncmp(pOtp, "no", 2) == 0){
-		return PAM_SUCCESS;
-	}
-	
+
 	if (strstr(buffer, "\"status\":\"on\"") != NULL) {
 		
-		char *pch;
-		if((pch = strstr(buffer, "\"two_factor\"")) != NULL){
-			char code[6] ;
-			char *input;
+		if(strncmp(pOtp, "yes", 3) == 0){
 
-			strncpy (code, pch + strlen("\"two_factor\":{\"token\":\""), 6);
+			char *pch;
+			if((pch = strstr(buffer, "\"two_factor\"")) != NULL){
+				char code[6] ;
+				char *input;
 
-			if( (ret = converse(pamh, 1 , pmsg, &resp)) != PAM_SUCCESS ) {
-			// if this function fails, make sure that ChallengeResponseAuthentication in sshd_config is set to yes
-				return ret ;
-			}
+				strncpy (code, pch + strlen("\"two_factor\":{\"token\":\""), 6);
 
-			// retrieving user input 
-			if( resp ) {
-				if( (flags & PAM_DISALLOW_NULL_AUTHTOK) && resp[0].resp == NULL ) {
+				if( (ret = converse(pamh, 1 , pmsg, &resp)) != PAM_SUCCESS ) {
+				// if this function fails, make sure that ChallengeResponseAuthentication in sshd_config is set to yes
+					return ret ;
+				}
+
+				// retrieving user input 
+				if( resp ) {
+					if( (flags & PAM_DISALLOW_NULL_AUTHTOK) && resp[0].resp == NULL ) {
 	    				free( resp );
 	    				return PAM_AUTH_ERR;
-				}
-				input = resp[ 0 ].resp;
-				resp[ 0 ].resp = NULL; 		  				  
+					}
+					input = resp[ 0 ].resp;
+					resp[ 0 ].resp = NULL; 		  				  
     			} else {
-				return PAM_CONV_ERR;
-			}
+					return PAM_CONV_ERR;
+				}
 
-			// comparing user input with known code 
-			if(strncmp(code,input,6) != 0){
+				// comparing user input with known code 
+				if(strncmp(code,input,6) != 0){
+					free( input ) ;
+					return PAM_AUTH_ERR;
+				}
 				free( input ) ;
-				return PAM_AUTH_ERR;
 			}
-			free( input ) ;
-		}
 			
-	} 
-	
+		}else{
+			return PAM_SUCCESS;
+		}
+	}
 	//printf("buffer response from  status  call -> %s\n",buffer);
 
 	return PAM_SUCCESS;
