@@ -43,7 +43,7 @@ else:
     print("use 'setup.py -f <file.conf>'");
     exit(1);
 
-'''
+
 if os.path.isfile(SSHD_PAM_CONFIG_FILE): 
     # read openvpn PAM config file
     f = open(SSHD_PAM_CONFIG_FILE,"r")
@@ -62,56 +62,75 @@ if os.path.isfile(SSHD_PAM_CONFIG_FILE):
         f.close()
 else:
     exit(1)
-'''
+
 
 # read sshd_config file
 f = open(SSHD_CONFIG,"r")
 lines = f.readlines()
 f.close()
 
-forceCommandWrapper = False
-challengeResponseAuthenticationYes = False
-usePamYes = False
+#forceCommandWrapper = False
+authenticationMethodsKey = False
+challengeResponseAuthenticationKey = False
+usePamKey = False
+passwordAuthenticationKey = False
 
 shutil.move(SSHD_CONFIG, SSHD_CONFIG + "~")
 
-# Put latch wrapper
 # Put ChallengeResponseAuthentication yes
 # Put UsePAM yes
+# Put PasswordAuthentication no
 f = open(SSHD_CONFIG,"w");
 for line in lines:
     if line.find("ChallengeResponseAuthentication") != -1 and line.find("#") == -1:
         f.write("ChallengeResponseAuthentication yes\n")
-        challengeResponseAuthenticationYes = True
+        challengeResponseAuthenticationKey = True
     elif line.find("UsePAM") != -1 and line.find("#") == -1:
         f.write("UsePAM yes\n")
-        usePamYes = True
+        usePamKey = True
+    elif line.find("PasswordAuthentication") != -1 and line.find("#") == -1:
+        f.write("PasswordAuthentication no\n")
+        passwordAuthenticationKey = True
+    elif line.find("AuthenticationMethods") != -1 and line.find("#") == -1:
+        f.write("AuthenticationMethods keyboard-interactive\n")
+        authenticationMethodsKey = True
     else:
         f.write(line)
+        '''
         if line.find("ForceCommand " + WRAPPER_EXE) != -1 :
             forceCommandWrapper = True
+        '''
 f.close();
 
-if not usePamYes:
+if not usePamKey:
     f = open(SSHD_CONFIG,"a")
     f.write("UsePAM yes\n")
     f.close()
-if not challengeResponseAuthenticationYes:
+if not challengeResponseAuthenticationKey:
     f = open(SSHD_CONFIG,"a")
     f.write("ChallengeResponseAuthentication yes\n")
     f.close()
-
+if not passwordAuthenticationKey:
+    f = open(SSHD_CONFIG,"a")
+    f.write("PasswordAuthentication no\n")
+    f.close()
+if not authenticationMethodsKey:
+    f = open(SSHD_CONFIG,"a")
+    f.write("AuthenticationMethods keyboard-interactive\n")
+    f.close()
+'''
 if not forceCommandWrapper:
     # add latch to ssh configuration
     f = open(SSHD_CONFIG,"a")
     f.write("ForceCommand " + WRAPPER_EXE + "\n")
     f.close()
-
-
+'''
+'''
 # install the wrapper sshd.sh in /usr/sbin
 if not os.path.isfile(WRAPPER_SH):
     os.open (WRAPPER_SH, os.O_CREAT, int("0554",8))
     shutil.copyfile('sshd.sh', WRAPPER_SH)
+'''
 '''
 if not os.path.isfile(WRAPPER_PY):
     os.open (WRAPPER_PY, os.O_CREAT, int("0500",8))
