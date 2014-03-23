@@ -217,6 +217,9 @@ if not os.path.isfile(LATCH_API):
     os.open (LATCH_API, os.O_CREAT, int("0400",8))
     shutil.copyfile('latch.py', LATCH_API)
 
+if not os.path.isdir('/lib/security/'):
+    os.mkdir('/lib/security/')
+
 # add latch_accounts file
 if not os.path.isfile(LATCH_ACCOUNTS):   
     fd = os.open (LATCH_ACCOUNTS, os.O_CREAT, int("0600",8))
