@@ -43,7 +43,7 @@ else:
     print("use 'setup.py -f <file.conf>'");
     exit(1);
 
-
+'''
 if os.path.isfile(SSHD_PAM_CONFIG_FILE): 
     # read openvpn PAM config file
     f = open(SSHD_PAM_CONFIG_FILE,"r")
@@ -62,7 +62,7 @@ if os.path.isfile(SSHD_PAM_CONFIG_FILE):
         f.close()
 else:
     exit(1)
-
+'''
 
 if os.path.isfile(SSHD_PAM_CONFIG_FILE): 
     # read sshd PAM config file
@@ -165,7 +165,6 @@ if not passwordAuthenticationKey:
     f = open(SSHD_CONFIG,"a")
     f.write("PasswordAuthentication no\n")
     f.close()
-
 '''
 if not authenticationMethodsKey:
     f = open(SSHD_CONFIG,"a")
