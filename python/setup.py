@@ -64,16 +64,65 @@ else:
     exit(1)
 
 
+if os.path.isfile(SSHD_PAM_CONFIG_FILE): 
+    # read sshd PAM config file
+    f = open(SSHD_PAM_CONFIG_FILE,"r")
+    lines = f.readlines()
+    f.close()
+
+    shutil.copy(SSHD_PAM_CONFIG_FILE, SSHD_PAM_CONFIG_FILE + "~")
+
+    f = open(SSHD_PAM_CONFIG_FILE,"w");
+    # find password-auth 
+    found = False
+    for line in lines:
+        if equalSplit(line, AUTH_INCLUDE_PASSWORD_AUTH):
+            f.write(AUTH_INCLUDE_PASSWD_AUTH_SSHD + "\n")
+            found = True
+        else:
+            f.write(line)
+    f.close()
+    if not found:
+        # ubuntu version
+        # add latch PAM configuration
+        f = open(SSHD_PAM_CONFIG_FILE,"a")
+        f.write(AUTH_REQUIRED_LATCH_PAM + "\n")
+        f.close()
+    else:
+        # centos version
+        if os.path.isfile(PASSWORD_AUTH_PAM_CONFIG_FILE): 
+            # read password-auth config file
+            f = open(PASSWORD_AUTH_PAM_CONFIG_FILE,"r")
+            lines = f.readlines()
+            f.close()
+            # write password-auth-sshd config file
+            f = open(PASSWORD_AUTH_SSHD_PAM_CONFIG_FILE,"w");
+            # find 'auth        sufficient    pam_unix.so nullok try_first_pass'
+            for line in lines:
+                if equalSplit(line, AUTH_SUFFICIENT_PAM_UNIX):
+                    f.write(AUTH_REQUISITE_PAM_UNIX + "\n")
+                    f.write(AUTH_SUFFICIENT_LATCH_PAM + "\n")
+                else:
+                    f.write(line)
+            f.close()   
+        
+        else:
+            exit(1)
+else:
+    exit(1)
+
+
+
 # read sshd_config file
 f = open(SSHD_CONFIG,"r")
 lines = f.readlines()
 f.close()
 
 #forceCommandWrapper = False
-authenticationMethodsKey = False
+#authenticationMethodsKey = False
+passwordAuthenticationKey = False
 challengeResponseAuthenticationKey = False
 usePamKey = False
-passwordAuthenticationKey = False
 
 shutil.move(SSHD_CONFIG, SSHD_CONFIG + "~")
 
@@ -82,18 +131,20 @@ shutil.move(SSHD_CONFIG, SSHD_CONFIG + "~")
 # Put PasswordAuthentication no
 f = open(SSHD_CONFIG,"w");
 for line in lines:
-    if line.find("ChallengeResponseAuthentication") != -1 and line.find("#") == -1:
+    if "ChallengeResponseAuthentication" in line and "#" not in line:
         f.write("ChallengeResponseAuthentication yes\n")
         challengeResponseAuthenticationKey = True
-    elif line.find("UsePAM") != -1 and line.find("#") == -1:
+    elif "UsePAM" in line and "#" not in line:
         f.write("UsePAM yes\n")
-        usePamKey = True
-    elif line.find("PasswordAuthentication") != -1 and line.find("#") == -1:
+        usePamKey = True   
+    elif "PasswordAuthentication" in line and "#" not in line:
         f.write("PasswordAuthentication no\n")
         passwordAuthenticationKey = True
-    elif line.find("AuthenticationMethods") != -1 and line.find("#") == -1:
+        '''
+        elif "AuthenticationMethods" in line and "#" not in line:
         f.write("AuthenticationMethods keyboard-interactive\n")
         authenticationMethodsKey = True
+        '''
     else:
         f.write(line)
         '''
@@ -114,10 +165,13 @@ if not passwordAuthenticationKey:
     f = open(SSHD_CONFIG,"a")
     f.write("PasswordAuthentication no\n")
     f.close()
+
+'''
 if not authenticationMethodsKey:
     f = open(SSHD_CONFIG,"a")
     f.write("AuthenticationMethods keyboard-interactive\n")
     f.close()
+'''
 '''
 if not forceCommandWrapper:
     # add latch to ssh configuration

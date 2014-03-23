@@ -34,25 +34,45 @@ if os.path.isfile(SSHD_PAM_CONFIG_FILE):
     f = open(SSHD_PAM_CONFIG_FILE,"r");
     lines = f.readlines();
     f.close();
+
+    shutil.copy(SSHD_PAM_CONFIG_FILE, SSHD_PAM_CONFIG_FILE + "~")
+
     # delete latch PAM 
     f = open(SSHD_PAM_CONFIG_FILE,"w");
     for line in lines:
-        if line.find(LATCH_PAM_CONFIG) == -1 :
+        if equalSplit(line, AUTH_INCLUDE_PASSWD_AUTH_SSHD):
+            # centos version
+            f.write(AUTH_INCLUDE_PASSWORD_AUTH + "\n")
+        elif not equalSplit(line, AUTH_REQUIRED_LATCH_PAM):
+            # ubuntu version
+            f.write(line)
+    f.close()
+else:
+    print("Can't open sshd pam config file")
+
+
+if os.path.isfile(SSHD_CONFIG):
+    # read sshd_config file
+    f = open(SSHD_CONFIG,"r")
+    lines = f.readlines()
+    f.close()
+
+    shutil.copy(SSHD_CONFIG, SSHD_CONFIG + "~")
+
+    # delete latch
+    f = open(SSHD_CONFIG,"w")
+    for line in lines:
+        if "ChallengeResponseAuthentication" in line and "#" not in line:
+            f.write("ChallengeResponseAuthentication no\n")
+        elif "PasswordAuthentication" in line and "#" not in line:
+            f.write("PasswordAuthentication yes\n")
+        elif not equalSplit(line, "ForceCommand " + WRAPPER_EXE):
             f.write(line);
     f.close();
+else:
+    print("Can't open sshd_config file")
 
-# read sshd_config file
-f = open(SSHD_CONFIG,"r");
-lines = f.readlines();
-f.close();
-# delete latch
-f = open(SSHD_CONFIG,"w");
-for line in lines:
-    if line.find("ForceCommand " + WRAPPER_EXE) == -1 :
-        f.write(line);
-f.close();
-
-
+# uninstall files
 if os.path.isfile(LATCH_ACCOUNTS):
     os.remove(LATCH_ACCOUNTS)
 if os.path.isfile(LATCH_CONFIG):
@@ -63,6 +83,8 @@ if os.path.isfile(WRAPPER_PY):
     os.remove(WRAPPER_PY)
 if os.path.isfile(WRAPPER_EXE):
     os.remove(WRAPPER_EXE)
+if os.path.isfile(PASSWORD_AUTH_SSHD_PAM_CONFIG_FILE):
+    os.remove(PASSWORD_AUTH_SSHD_PAM_CONFIG_FILE)
 if os.path.isdir(LATCH_OPENSSH_PATH):
     shutil.rmtree(LATCH_OPENSSH_PATH)
 if os.path.isfile(PAIR_BIN):
