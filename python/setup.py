@@ -119,7 +119,7 @@ lines = f.readlines()
 f.close()
 
 #forceCommandWrapper = False
-#authenticationMethodsKey = False
+authenticationMethodsKey = False
 passwordAuthenticationKey = False
 challengeResponseAuthenticationKey = False
 usePamKey = False
@@ -140,11 +140,9 @@ for line in lines:
     elif "PasswordAuthentication" in line and "#" not in line:
         f.write("PasswordAuthentication no\n")
         passwordAuthenticationKey = True
-        '''
-        elif "AuthenticationMethods" in line and "#" not in line:
-        f.write("AuthenticationMethods keyboard-interactive\n")
+    elif "AuthenticationMethods" in line and "#" not in line:
+        #f.write("AuthenticationMethods keyboard-interactive\n")
         authenticationMethodsKey = True
-        '''
     else:
         f.write(line)
         '''
