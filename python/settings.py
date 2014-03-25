@@ -24,17 +24,21 @@
 
 
 import sys
+
 from latchHelper import *
+from translation import *
+
+
 
 if len(sys.argv) == 3 and sys.argv[1] == "-f":
     secret_key = getConfigParameter("secret_key", sys.argv[2])
     app_id = getConfigParameter("app_id", sys.argv[2])
     if app_id == None or secret_key == None:
-        print("Can't read config file");
+        print(CANT_READ_CONFIG_FILE_MSG);
         exit()
 
     replaceConfigParameters(app_id, secret_key)
 
 elif len(sys.argv) != 1:
-    print("use 'settings.py -f <file.conf>'")
+    print(INCORRECT_SETTINGS_USE_MSG)
     exit()

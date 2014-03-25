@@ -27,6 +27,8 @@ import os
 import shutil
 
 from latchHelper import *
+from translation import *
+
 
 
 if os.path.isfile(SSHD_PAM_CONFIG_FILE):
@@ -48,7 +50,7 @@ if os.path.isfile(SSHD_PAM_CONFIG_FILE):
             f.write(line)
     f.close()
 else:
-    print("Can't open sshd pam config file")
+    print(CANT_OPEN_SSHD_PAM_MSG)
 
 
 if os.path.isfile(SSHD_CONFIG):
@@ -70,7 +72,7 @@ if os.path.isfile(SSHD_CONFIG):
             f.write(line);
     f.close();
 else:
-    print("Can't open sshd_config file")
+    print(CANT_OPEN_SSHD_CONFIG_MSG)
 
 # uninstall files
 if os.path.isfile(LATCH_ACCOUNTS):
@@ -96,4 +98,4 @@ if os.path.isfile(PLUGIN_BIN):
 if os.path.isfile(SETTINGS_BIN):
     os.remove(SETTINGS_BIN)
 
-print("Uninstall completed")
+print(UNINSTALLED_MSG)

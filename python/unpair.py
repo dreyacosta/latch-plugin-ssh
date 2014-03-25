@@ -28,6 +28,7 @@ import os
 import latch
 
 from latchHelper import *
+from translation import *
 
 
 
@@ -35,25 +36,25 @@ if len(sys.argv) == 3 and sys.argv[1] == "-f":
     secret_key = getConfigParameter("secret_key", sys.argv[2])
     app_id = getConfigParameter("app_id", sys.argv[2])
     if app_id == None or secret_key == None:
-        print("Can't read config file.");
+        print(CANT_READ_CONFIG_FILE_MSG);
         exit()
 
     replaceConfigParameters(app_id, secret_key)
 elif len(sys.argv) != 1:
-    print("use 'unpair.py [ -f <file.conf> ]'");
+    print(INCORRECT_UNPAIR_USE_MSG);
     exit();
 
 secret_key = getConfigParameter("secret_key");
 app_id = getConfigParameter("app_id");
 
 if app_id == None or secret_key == None:
-    print("Can't read config file.");
+    print(CANT_READ_CONFIG_FILE_MSG);
     exit();
 
 user = os.getlogin()
 accountId = getAccountId(user);
 if accountId == None:
-    print("User '" + user + "' not paired.");
+    print(UNPAIRED_USER_MSG_PART_1 + user + UNPAIRED_USER_MSG_PART_2);
     exit();
 
 api = latch.Latch(app_id, secret_key);
@@ -62,16 +63,16 @@ latch.Latch.set_host(LATCH_HOST);
 try:
     res = api.unpair(accountId);
 except:
-    print("Error: Some exception happened.")
+    print(SOME_EXCEPTION_MSG)
     exit()
 
 responseError = res.get_error();
 
 if responseError != "" and responseError.get_message() != 'Account not paired':
     if responseError.get_message() == 'Invalid application signature':
-        print("Settings error: Bad secret key or application id.")
+        print(INVALID_APP_SIGN_MSG)
     else:
         print(responseError.get_message())
 else:
     deleteAccount(accountId)
-    print(UNPAIR_MSG);
+    print(UNPAIRED_SUCCESSFULLY_MSG);

@@ -28,31 +28,32 @@ import os
 import latch
 
 from latchHelper import *
+from translation import *
 
 
 if len(sys.argv) == 4 and sys.argv[2] == "-f":
     secret_key = getConfigParameter("secret_key", sys.argv[3])
     app_id = getConfigParameter("app_id", sys.argv[3])
     if app_id == None or secret_key == None:
-        print("Can't read config file.");
+        print(CANT_READ_CONFIG_FILE_MSG);
         exit()
 
     replaceConfigParameters(app_id, secret_key)
 
 elif len(sys.argv) != 2:
-    print("use 'pair.py <TOKEN> [ -f <file.conf> ]'");
+    print(INCORRECT_PAIR_USE_MSG);
     exit();
 
 secret_key = getConfigParameter("secret_key");
 app_id = getConfigParameter("app_id");
 
 if app_id == None or secret_key == None:
-    print("Can't read config file.");
+    print(CANT_READ_CONFIG_FILE_MSG);
     exit()
 
 user = os.getlogin()
 if isPair(user):
-    print("User '"+ user + "' is already paired.")
+    print(PAIRED_USER_MSG_PART_1 + user + PAIRED_USER_MSG_PART_2)
     exit()
 
 api = latch.Latch(app_id, secret_key)
@@ -61,14 +62,14 @@ latch.Latch.set_host(LATCH_HOST)
 reply = sys.argv[1]
 
 if len(reply) != 6:
-    print("Token not found")
+    print(BAD_PAIRING_CODE_LENGTH_MSG)
     exit()
 
 token = reply;
 try:
     res = api.pair(token)
 except:
-    print("Error: Some exception happened.")
+    print(SOME_EXCEPTION_MSG)
     exit()
 
 responseData = res.get_data()
@@ -77,10 +78,9 @@ responseError = res.get_error()
 if 'accountId' in responseData:
     accountId = responseData["accountId"]
     addAccount(user, accountId)
-    print(PAIR_MSG);
+    print(PAIRED_SUCCESSFULLY_MSG);
 elif responseError != "":
-    title_error = 'Error - ' + str(responseError.get_code())
     if responseError.get_message() == 'Invalid application signature':
-        print("Settings error: Bad secret key or application id.")
+        print(INVALID_APP_SIGN_MSG)
     else:
         print(responseError.get_message())

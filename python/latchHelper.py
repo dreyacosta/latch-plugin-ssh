@@ -62,12 +62,10 @@ PAIR_PLUGIN = LATCH_OPENSSH_PATH + "pair.py"
 UNPAIR_PLUGIN = LATCH_OPENSSH_PATH + "unpair.py"
 SETTINGS_PLUGIN = LATCH_OPENSSH_PATH + "settings.py"
 LATCH_HELPER_PLUGIN = LATCH_OPENSSH_PATH + "latchHelper.py"
+TRANSLATION_PLUGIN = LATCH_OPENSSH_PATH + "translation.py"
 
 LATCH_API = LATCH_OPENSSH_PATH + "latch.py"
 
-
-PAIR_MSG = "Account paired succesfully."
-UNPAIR_MSG = "Account unpaired succesfully."
 
 
 
