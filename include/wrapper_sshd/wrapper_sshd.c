@@ -9,24 +9,6 @@
 
 
 
-
-/*
-int latch()
-{
-    int i,f;
-    f= fork();
-    if (f==0){
-        execl("/usr/sbin/sshd.py", "sshd.py", NULL);
-    }
-
-    int status;
-    wait(&status);
-
-    return status;
-    
-}
-*/
-
 static const char* getAccountId(const char* pUser, const char* pAccounts) {
 
 	char * line = NULL;
@@ -38,7 +20,7 @@ static const char* getAccountId(const char* pUser, const char* pAccounts) {
 
 	fp = fopen(pAccounts,"r");
 	if (fp == NULL) {
-        	perror("Failed to open file \"latch accounts\"");
+        	//perror("Failed to open file \"latch accounts\"");
         	return NULL;
     	}
 
@@ -46,10 +28,11 @@ static const char* getAccountId(const char* pUser, const char* pAccounts) {
 		token = strsep(&line,delimiters);
 		if(token[strlen(token)-1] == ':'  &&  strncmp(token,pUser,strlen(token)-1) == 0){
 			token = strsep(&line,delimiters);
-			if(strlen(token) == 64)
+			if(strlen(token) == 64){
 				return token;
-			else
+			}else{
 				return NULL;
+			}
 		}
 	}
 
@@ -73,7 +56,7 @@ static const char *getConfig(const char* pParameter, const char* pConfig) {
 
 	FILE *fp = fopen(pConfig,"r");
 	if (fp == NULL) {
-        	perror("Failed to open file \"latch.conf\"");
+        	//perror("Failed to open file \"latch.conf\"");
         	return NULL;
     	}
 
@@ -89,10 +72,8 @@ static const char *getConfig(const char* pParameter, const char* pConfig) {
 
 void send_syslog_alert(){  
 
-	openlog ("Latch", LOG_PID, LOG_AUTH);
-     
-	syslog (LOG_ALERT, "Latch-auth-pam warning: Someone tried to access. Latch locked");
-     
+	openlog ("Latch", LOG_PID, LOG_AUTH); 
+	syslog (LOG_ALERT, "Latch-auth-pam warning: Someone tried to access. Latch locked");  
 	closelog ();
 }
 
@@ -101,8 +82,8 @@ const char *getUserName(){
 	register struct passwd *pw;
 	register uid_t uid;
 
-	uid = getuid ();
-	pw = getpwuid (uid);
+	uid = getuid();
+	pw = getpwuid(uid);
 	if (pw){
 		return pw->pw_name;
 	}
@@ -145,9 +126,9 @@ int latch()
 
 	buffer = status(pAccountId);
 	
-	if(buffer == NULL || strcmp(buffer,"") == 0)
+	if(buffer == NULL || strcmp(buffer,"") == 0){
 		return 0;
-
+	}
 	if (strstr(buffer, "\"status\":\"off\"") != NULL){
 		//fprintf (stderr, "Latch locked\n");
                 send_syslog_alert();
@@ -160,13 +141,8 @@ int latch()
 
 int main( void )
 {
-
-	int j;
-	j= latch();
-
-	if (j){
+	if (latch()){
 		return 1;
-        	//printf("disconnect\n");
 	}else{
 		execl("/usr/sbin/sshd.sh", "sshd.sh", NULL);
 	}
