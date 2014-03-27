@@ -39,7 +39,7 @@ def pair_gui():
     app_id = getConfigParameter("app_id")
 
     if app_id == None or secret_key == None:
-        print(CANT_READ_CONFIG_FILE_MSG)
+        eg.msgbox(msg=CANT_READ_CONFIG_FILE_MSG,title=ERROR_TITLE)
         exit();
 
     api = latch.Latch(app_id, secret_key)
@@ -77,6 +77,9 @@ def pair_gui():
             eg.msgbox(msg=INVALID_APP_SIGN_MSG,title=ERROR_TITLE)
         else:
             eg.msgbox(msg=responseError.get_message(),title=ERROR_TITLE)
+    else:
+        eg.msgbox(msg=SOME_EXCEPTION_MSG,title=ERROR_TITLE)
+        return
         
 
 def unpair_gui():
@@ -85,7 +88,7 @@ def unpair_gui():
     app_id = getConfigParameter("app_id");
 
     if app_id == None or secret_key == None:
-        print(CANT_READ_CONFIG_FILE_MSG);
+        eg.msgbox(msg=CANT_READ_CONFIG_FILE_MSG,title=ERROR_TITLE)
         exit();
 
     api = latch.Latch(app_id, secret_key);

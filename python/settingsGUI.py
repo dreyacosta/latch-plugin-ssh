@@ -51,7 +51,7 @@ while 1:
     errmsg = ""
     for i in range(len(fieldNames)):
         if fieldValues[i].strip() == "":
-            errmsg += ('"%s"' % fieldNames[i] + REQUIRED_FIELD_MSG + '\n\n')
+            errmsg += ('"%s" ' % fieldNames[i] + REQUIRED_FIELD_MSG + '\n')
     if errmsg == "":
         replaceConfigParameters(fieldValues[0], fieldValues[1])
         secret_key = fieldValues[1]

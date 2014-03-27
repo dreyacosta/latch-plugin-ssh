@@ -84,3 +84,5 @@ elif responseError != "":
         print(INVALID_APP_SIGN_MSG)
     else:
         print(responseError.get_message())
+else:
+    print(SOME_EXCEPTION_MSG)
