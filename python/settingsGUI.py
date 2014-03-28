@@ -28,6 +28,7 @@ import sys
 import os
 
 from latchHelper import *
+from translation import *
 
 
  
@@ -35,12 +36,12 @@ secret_key = getConfigParameter("secret_key");
 app_id = getConfigParameter("app_id");
 
 if app_id == None or secret_key == None:
-    print("Can't read config file");
+    print(CANT_READ_CONFIG_FILE_MSG);
     exit();
 
-msg = "Identify your application"
-title = PLUGIN_NAME + " settings"
-fieldNames = ["Application ID","Secret key"]
+msg = CONFIG_MSG
+title = CONFIG_TITLE
+fieldNames = [APP_ID,SECRET_KEY]
 fieldValues = [app_id, secret_key]  # we start with blanks for the values
 fieldValues = eg.multenterbox(msg,title, fieldNames, fieldValues)
  
@@ -50,7 +51,7 @@ while 1:
     errmsg = ""
     for i in range(len(fieldNames)):
         if fieldValues[i].strip() == "":
-            errmsg += ('"%s" is a required field.\n\n' % fieldNames[i])
+            errmsg += ('"%s" ' % fieldNames[i] + REQUIRED_FIELD_MSG + '\n')
     if errmsg == "":
         replaceConfigParameters(fieldValues[0], fieldValues[1])
         secret_key = fieldValues[1]

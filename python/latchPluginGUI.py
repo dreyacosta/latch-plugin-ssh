@@ -29,6 +29,7 @@ import os
 import latch
 
 from latchHelper import *
+from translation import *
 
 
 
@@ -38,29 +39,29 @@ def pair_gui():
     app_id = getConfigParameter("app_id")
 
     if app_id == None or secret_key == None:
-        print("Can't read config file")
+        eg.msgbox(msg=CANT_READ_CONFIG_FILE_MSG,title=ERROR_TITLE)
         exit();
 
     api = latch.Latch(app_id, secret_key)
     latch.Latch.set_host(LATCH_HOST)
 
-    reply = eg.enterbox(msg='Token', title='Pair', default='', strip=True, image=None, root=None);
+    reply = eg.enterbox(msg=INSERT_PAIRING_CODE_MSG, title=PAIR_TITLE, default='', strip=True, image=None, root=None);
     if reply == None:
         exit()
 
     if reply == "":
-        eg.msgbox(msg="You didn't put a token",title='Error')
+        eg.msgbox(msg=EMPTY_PAIRING_CODE_MSG,title=ERROR_TITLE)
         return
 
     if len(reply) != 6:
-        eg.msgbox(msg="Token not found",title='Error')
+        eg.msgbox(msg=BAD_PAIRING_CODE_LENGTH_MSG,title=ERROR_TITLE)
         return
 
     token = reply
     try:
         res = api.pair(token)
     except:
-        eg.msgbox(msg="Some exception happened",title='Error')
+        eg.msgbox(msg=SOME_EXCEPTION_MSG,title=ERROR_TITLE)
         return
 
     responseData = res.get_data();
@@ -70,13 +71,15 @@ def pair_gui():
         user = os.getlogin()
         accountId = responseData["accountId"]
         addAccount(user, accountId)
-        eg.msgbox(msg='Paired',title='Pair');
+        eg.msgbox(msg=PAIRED_SUCCESSFULLY_MSG,title=PAIR_TITLE);
     elif responseError != "":
-        title_error = 'Error - ' + str(responseError.get_code())
         if responseError.get_message() == 'Invalid application signature':
-            eg.msgbox(msg="Settings error: Bad secret key or application id",title=title_error)
+            eg.msgbox(msg=INVALID_APP_SIGN_MSG,title=ERROR_TITLE)
         else:
-            eg.msgbox(msg=responseError.get_message(),title=title_error)
+            eg.msgbox(msg=responseError.get_message(),title=ERROR_TITLE)
+    else:
+        eg.msgbox(msg=SOME_EXCEPTION_MSG,title=ERROR_TITLE)
+        return
         
 
 def unpair_gui():
@@ -85,7 +88,7 @@ def unpair_gui():
     app_id = getConfigParameter("app_id");
 
     if app_id == None or secret_key == None:
-        print("Can't read config file");
+        eg.msgbox(msg=CANT_READ_CONFIG_FILE_MSG,title=ERROR_TITLE)
         exit();
 
     api = latch.Latch(app_id, secret_key);
@@ -94,45 +97,46 @@ def unpair_gui():
     user = os.getlogin()
     accountId = getAccountId(user)
     if accountId == None:
-        eg.msgbox(msg="Can't read latch_accounts file",title='Error')
+        eg.msgbox(msg=CANT_READ_ACCOUNTS_FILE_MSG,title=ERROR_TITLE)
         return;
 
     try:
         res = api.unpair(accountId)
     except:
-        eg.msgbox(msg="Some exception happened",title='Error')
+        eg.msgbox(msg=SOME_EXCEPTION_MSG,title=ERROR_TITLE)
         return
 
     responseError = res.get_error()
 
     if responseError != "" and responseError.get_message() != 'Account not paired':
-        title_error = 'Error - ' + str(responseError.get_code())
         if responseError.get_message() == 'Invalid application signature':
-            eg.msgbox(msg="Settings error: Bad secret key or application id",title=title_error)
+            eg.msgbox(msg=INVALID_APP_SIGN_MSG,title=ERROR_TITLE)
         else:
-            eg.msgbox(msg=responseError.get_message(),title=title_error)
+            eg.msgbox(msg=responseError.get_message(),title=ERROR_TITLE)
     else:
         deleteAccount(accountId)
-        eg.msgbox(msg='Unpaired',title='Unpair')
+        eg.msgbox(msg=UNPAIRED_SUCCESSFULLY_MSG,title=UNPAIR_TITLE)
 
 
 
 
-operations = ["Pair","Unpair","Exit"]
+operations = [PAIR_TITLE,UNPAIR_TITLE,EXIT_TITLE]
 user = os.getlogin()
 
 while 1:
     if isPair(user):
-        operations = ["Unpair","Exit"]
+        operations = [UNPAIR_TITLE,EXIT_TITLE]
+        message = UNPAIR_MSG
     else:
-        operations = ["Pair","Exit"]
+        operations = [PAIR_TITLE,EXIT_TITLE]
+        message = PAIR_MSG
 
-    reply = eg.buttonbox(msg='Operation', title=PLUGIN_NAME,image=None, choices=operations)
+    reply = eg.buttonbox(msg=message, title=PLUGIN_NAME,image=None, choices=operations)
 
-    if reply == "Pair":
+    if reply == PAIR_TITLE:
         pair_gui()
-    elif reply == "Unpair":
+    elif reply == UNPAIR_TITLE:
         unpair_gui()
-    elif reply == "Exit":
+    elif reply == EXIT_TITLE:
         exit();
 

@@ -6,21 +6,19 @@
  modify it under the terms of the GNU Lesser General Public
  License as published by the Free Software Foundation; either
  version 2.1 of the License, or (at your option) any later version.
- 
+
  This library is distributed in the hope that it will be useful,
  but WITHOUT ANY WARRANTY; without even the implied warranty of
  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  Lesser General Public License for more details.
- 
+
  You should have received a copy of the GNU Lesser General Public
  License along with this library; if not, write to the Free Software
  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 '''
 
 
-import sys
 import os
-import latch
 
 
 PLUGIN_NAME = "SSH - latch"
@@ -33,11 +31,25 @@ LATCH_ACCOUNTS = LATCH_OPENSSH_PATH + ".latch_accounts"
 LATCH_CONFIG =  "/etc/ssh-latch.conf"
 LATCH_HOST = "https://latch.elevenpaths.com"
 
+SSHD_PAM_CONFIG_FILE = "/etc/pam.d/sshd"
+PASSWORD_AUTH_PAM_CONFIG_FILE = "/etc/pam.d/password-auth"
+PASSWORD_AUTH_SSHD_PAM_CONFIG_FILE = "/etc/pam.d/passwd-auth-sshd"
+LATCH_PAM_SO = "/lib/security/pam_latch.so"
+
+AUTH_INCLUDE_PASSWORD_AUTH = "auth       include      password-auth"
+AUTH_INCLUDE_PASSWD_AUTH_SSHD = "auth	   include	passwd-auth-sshd"
+AUTH_SUFFICIENT_PAM_UNIX = "auth        sufficient     pam_unix.so nullok try_first_pass"
+AUTH_REQUISITE_PAM_UNIX = "auth        requisite     pam_unix.so nullok try_first_pass"
+AUTH_SUFFICIENT_LATCH_PAM = "auth        sufficient     " + LATCH_PAM_SO + "  accounts=" + LATCH_ACCOUNTS + "  config=" + LATCH_CONFIG + "  otp=yes"
+AUTH_REQUIRED_LATCH_PAM = "auth       required     " + LATCH_PAM_SO + "  accounts=" + LATCH_ACCOUNTS + "  config=" + LATCH_CONFIG + "  otp=yes"
+#auth       required     /lib/security/pam_latch.so  accounts=/usr/lib/latch/openssh/.latch_accounts  config=/etc/ssh-latch.conf  otp=yes
+
 SSHD_CONFIG = "/etc/ssh/sshd_config"
 
 WRAPPER_SH = "/usr/sbin/sshd.sh"
 WRAPPER_PY = "/usr/sbin/sshd.py"
 WRAPPER_EXE = "/usr/sbin/wp_sshd"
+
 
 PAIR_BIN = "/usr/bin/pairSSH"
 UNPAIR_BIN = "/usr/bin/unpairSSH"
@@ -50,10 +62,15 @@ PAIR_PLUGIN = LATCH_OPENSSH_PATH + "pair.py"
 UNPAIR_PLUGIN = LATCH_OPENSSH_PATH + "unpair.py"
 SETTINGS_PLUGIN = LATCH_OPENSSH_PATH + "settings.py"
 LATCH_HELPER_PLUGIN = LATCH_OPENSSH_PATH + "latchHelper.py"
+TRANSLATION_PLUGIN = LATCH_OPENSSH_PATH + "translation.py"
 
 LATCH_API = LATCH_OPENSSH_PATH + "latch.py"
 
 
+
+
+def equalSplit(string1, string2):
+    return string1.split() == string2.split()
 
 def getConfigParameter(name, configFile=LATCH_CONFIG):
 
@@ -108,7 +125,7 @@ def getAccountId(user):
                 words = line.split();
                 if len(words) == 2:
                     return words[1];
-                break; 
+                break;
         return None;
     '''
     else:
@@ -123,7 +140,7 @@ def isPair(user):
         lines = f.readlines()
         f.close()
         # find user
-        found = False          
+        found = False
         for line in lines:
             if line.find(user) != -1:
                 found = True
@@ -156,8 +173,8 @@ def addAccount(user, accountId):
         f.write(user + ": " + accountId + "\n")
         f.close();
     else:
-        # add latch account  
+        # add latch account
         fd = os.open (LATCH_ACCOUNTS, os.O_WRONLY | os.O_CREAT, int("0600",8))
         f = os.fdopen(fd)
         f.write(user + ": " + accountId + "\n");
-        f.close();    
+        f.close();
