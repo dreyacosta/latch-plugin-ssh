@@ -147,7 +147,7 @@ char* http_get_proxy(const char* pUrl) {
 	CURL* pCurl = curl_easy_init();
 	//int res = -1;
 	int i = 0;
-	int timeOut = 1;	
+	int timeOut = 2;	
 	struct curl_slist* chunk = NULL;
 	char* hostAndUrl;
 	
