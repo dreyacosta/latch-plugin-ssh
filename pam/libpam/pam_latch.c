@@ -32,6 +32,9 @@
 #include "../latch.h"
 
 
+const int ACCOUNT_ID_LENGTH = 64;
+
+
 /* expected hook */
 PAM_EXTERN int pam_sm_setcred( pam_handle_t *pamh, int flags, int argc, const char **argv ) {
 	return PAM_SUCCESS;
@@ -77,23 +80,20 @@ static const char* getAccountId(const char* pUser, const char* pAccounts) {
 	char * token = NULL;
 	size_t len = 0;
 	ssize_t read;
-	const char delimiters[]= " \t\n";
 	FILE *fp;
 
 	fp = fopen(pAccounts,"r");
 	if (fp == NULL) {
-        	perror("Failed to open file \"latch accounts\"");
+        	//perror("Failed to open file \"latch accounts\"");
         	return NULL;
     	}
 
+	char *toReturn = malloc(ACCOUNT_ID_LENGTH + 1);
 	while((read = getline(&line,&len, fp)) != -1){
-		token = strsep(&line,delimiters);
-		if(token[strlen(token)-1] == ':'  &&  strncmp(token,pUser,strlen(token)-1) == 0){
-			token = strsep(&line,delimiters);
-			if(strlen(token) == 64)
-				return token;
-			else
-				return NULL;
+		if((read == strlen(pUser) + ACCOUNT_ID_LENGTH + 3)  &&  strncmp(pUser, line, strlen(pUser)) == 0  &&  line[strlen(pUser)] == ':'){
+			strncpy(toReturn, line + strlen(pUser) + 2, ACCOUNT_ID_LENGTH);
+			toReturn[ACCOUNT_ID_LENGTH] = '\0';
+			return toReturn;
 		}
 	}
 
