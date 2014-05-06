@@ -73,7 +73,6 @@ def equalSplit(string1, string2):
     return string1.split() == string2.split()
 
 def getConfigParameter(name, configFile=LATCH_CONFIG):
-
     # read latch config file
     try:
         f = open(configFile,"r")
@@ -94,7 +93,6 @@ def getConfigParameter(name, configFile=LATCH_CONFIG):
     return None
 
 def replaceConfigParameters(newAppId, newSecret):
-
     # write config file
     fd = os.open (LATCH_CONFIG, os.O_WRONLY | os.O_CREAT, int("0600",8))
     f = os.fdopen(fd,"w")
@@ -113,7 +111,6 @@ def replaceConfigParameters(newAppId, newSecret):
     f.close()
 
 def getAccountId(user):
-
     if os.path.isfile(LATCH_ACCOUNTS):
         # read latch_accounts file
         f = open(LATCH_ACCOUNTS,"r");
@@ -121,7 +118,8 @@ def getAccountId(user):
         f.close();
 
         for line in lines:
-            if line.find(user) != -1:
+            words = line.split();
+            if words[0] == user + ':':
                 words = line.split();
                 if len(words) == 2:
                     return words[1];
@@ -142,7 +140,8 @@ def isPair(user):
         # find user
         found = False
         for line in lines:
-            if line.find(user) != -1:
+            words = line.split();
+            if words[0] == user + ':':
                 found = True
                 break
         if found:
