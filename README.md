@@ -8,7 +8,7 @@ The safety switch for your digital life
 
 * C compilator gcc and make.
 
-  For Ubuntu/Debian
+  For Ubuntu/Debian,
   ```
   sudo apt-get install gcc make
   ```
@@ -20,12 +20,12 @@ The safety switch for your digital life
 
 * Libraries: (libpam0g-dev, libcurl4-openssl-dev, libssl-dev).
 
-  For Ubuntu/Debian
+  For Ubuntu/Debian,
   ```
   sudo apt-get install libpam0g-dev libcurl4-openssl-dev libssl-dev
   ```
 
-  For RedHat/Centos
+  For RedHat/Centos,
   ```
   sudo yum install pam-devel libcurl-devel openssl-devel
   ```
